@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f4c81">
+<title>Mi rutina funcional</title>
+<style>
+:root{--b:#f4f7fa;--c:#fff;--p:#0f4c81;--g:#2e7d4f;--t:#17212b;--m:#667583;--l:#dbe3ea}
+*{box-sizing:border-box}body{margin:0;background:var(--b);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+main{max-width:760px;margin:auto;padding:14px 12px 90px}
+header{background:linear-gradient(135deg,#0f4c81,#1672b4);color:white;border-radius:20px;padding:20px}
+h1{margin:0 0 6px;font-size:25px}.sub{opacity:.9;font-size:14px}
+.notice{margin:12px 0;padding:12px;border-radius:14px;background:#fff5ce;border:1px solid #d8a800;font-size:14px;line-height:1.4}
+.tabs{display:flex;gap:8px;overflow:auto;position:sticky;top:0;background:rgba(244,247,250,.95);padding:10px 0;z-index:5}
+.tab{border:0;border-radius:999px;padding:10px 13px;background:#dce8f2;color:#18466d;font-weight:800;white-space:nowrap}.tab.on{background:var(--p);color:#fff}
+.day{display:none}.day.on{display:block}
+.card{background:var(--c);border-radius:16px;padding:14px;margin:10px 0;box-shadow:0 5px 18px rgba(16,44,70,.07)}
+.card.done{background:#e8f6ed}
+.ex{font-size:16px;font-weight:800}.hint{font-size:12px;color:var(--m);margin-top:4px;line-height:1.35}
+.row{display:grid;grid-template-columns:54px 30px 1fr 1fr;gap:7px;align-items:center;padding:7px 0;border-top:1px dashed #edf1f4}
+.row input[type=checkbox]{width:22px;height:22px;accent-color:var(--g)}
+input[type=text],input[type=number],textarea{width:100%;border:1px solid #ccd7df;border-radius:10px;padding:9px;font:inherit;background:#fff}
+.simple{display:grid;grid-template-columns:28px 1fr;gap:9px;align-items:start}.simple input{width:23px;height:23px;accent-color:var(--g)}
+.progress{background:#fff;border-radius:15px;padding:12px;margin:12px 0}.bar{height:11px;background:#e7edf2;border-radius:20px;overflow:hidden}.fill{height:100%;background:var(--g);width:0}
+.phead{display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px}
+footer{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--l);padding:10px 12px calc(10px + env(safe-area-inset-bottom));display:flex;gap:8px;justify-content:center}
+button.action{border:0;border-radius:12px;padding:11px 14px;background:var(--p);color:#fff;font-weight:800;max-width:350px;flex:1}.secondary{background:#dde7ef!important;color:#173c5d!important}
+textarea{min-height:82px;resize:vertical}
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>Rutina funcional · 5 días</h1>
+<div class="sub">Fuerza, core, movilidad, postura y pérdida de grasa</div>
+</header>
+
+<div class="notice"><b>Rodillas:</b> evita bloquearlas hacia atrás. Mantén una ligera flexión, abdomen activo y movimiento controlado. Suspende el ejercicio si aparece dolor, inflamación o inestabilidad.</div>
+
+<div class="progress">
+<div class="phead"><b>Progreso del día</b><span id="pct">0%</span></div>
+<div class="bar"><div class="fill" id="fill"></div></div>
+</div>
+
+<div class="tabs" id="tabs"></div>
+<div id="content"></div>
+</main>
+
+<footer>
+<button class="action secondary" id="resetDay">Reiniciar día</button>
+<button class="action" id="resetWeek">Reiniciar semana</button>
+</footer>
+
+<script>
+const routine=[
+{day:"Día 1",name:"Piernas + core",items:[
+["Sentadilla goblet a banco",3,"8–10","Rodillas alineadas; no bloquear al subir."],
+["Peso muerto rumano",3,"8–10","Rodillas suaves y cadera hacia atrás."],
+["Hip thrust / puente con peso",3,"10–12","Aprieta glúteos sin arquear la espalda."],
+["Curl femoral",3,"10–12","Movimiento controlado."],
+["Step-up bajo",2,"8/lado","Sube sin impulsarte con la pierna inferior."],
+["Elevación de talones",3,"12–15","No bloquees las rodillas."],
+["Dead bug",3,"6–8/lado","Mantén estable la zona lumbar."],
+["Plancha lateral",2,"20–30 s/lado","Cadera alineada."]
+],extras:[["Calentamiento","4 min caminata o bici + cat-cow x8 + puente x12 + bird dog x6/lado"],["Cardio opcional","10–15 min suave"]]},
+{day:"Día 2",name:"Tren superior + postura",items:[
+["Remo sentado",3,"10–12","Hombros lejos de las orejas."],
+["Press de pecho",3,"8–10","No arquees excesivamente la espalda."],
+["Jalón al pecho",3,"10–12","Lleva la barra al pecho."],
+["Press de hombro sentado",2,"8–10","Carga ligera y abdomen activo."],
+["Face pull",3,"12–15","Controla las escápulas."],
+["Rotación externa con banda",2,"12/lado","Codo pegado al cuerpo."],
+["Pallof press",3,"10/lado","Evita girar el tronco."],
+["Farmer carry",3,"30–40 s","Camina erguido."]
+],extras:[["Calentamiento","4 min suave + cat-cow x8 + bird dog x6/lado + wall slides x10"],["Cardio moderado","15–20 min"]]},
+{day:"Día 3",name:"Cardio + movilidad",items:[],extras:[
+["Cardio bajo impacto","30–40 min: bicicleta, elíptica o caminata"],
+["Movilidad de tobillo","10 por lado"],
+["Flexor de cadera","30 s por lado"],
+["Rotaciones torácicas","8 por lado"],
+["Wall slides","10 repeticiones"],
+["Equilibrio a una pierna","20–30 s por lado; rodilla suave"],
+["Puente con marcha","8 por lado"],
+["Respiración diafragmática","5 respiraciones lentas"],
+["Postura de pie","3 x 30 s sin bloquear las rodillas"]]},
+{day:"Día 4",name:"Piernas + estabilidad",items:[
+["Prensa inclinada",3,"10","No bloquees las rodillas."],
+["Peso muerto con kettlebell",3,"8–10","Comienza desde una altura cómoda."],
+["Split squat asistido",3,"8/lado","Usa apoyo y recorrido corto."],
+["Curl femoral",3,"10–12","Controla el regreso."],
+["Caminata lateral con banda",3,"10 pasos/lado","Pelvis estable."],
+["Tibialis raise",3,"12–15","Talones apoyados."],
+["Pallof press de rodillas",3,"10/lado","Tronco estable."],
+["Suitcase carry",3,"30 s/lado","No te inclines hacia el peso."]
+],extras:[["Calentamiento","4 min suave + puente x12 + bird dog x6/lado + movilidad de tobillo"]]},
+{day:"Día 5",name:"Full body funcional",items:[
+["Sentadilla goblet a banco",3,"10","Una serie por vuelta."],
+["Remo con mancuerna",3,"10/lado","Una serie por vuelta."],
+["Peso muerto rumano",3,"10","Una serie por vuelta."],
+["Flexiones inclinadas",3,"8–12","Una serie por vuelta."],
+["Step-up bajo",3,"8/lado","Una serie por vuelta."],
+["Farmer carry",3,"40 s","Una serie por vuelta."],
+["Bird dog",3,"6/lado","Una serie por vuelta."]
+],extras:[["Calentamiento","4 min suave + cat-cow x8 + puente x12 + bird dog x6/lado"],["Cardio final","15 min"]]}
+];
+
+let current=Number(localStorage.getItem("routine_day")||0);
+const k=(d,t,a,b="")=>`rut_${d}_${t}_${a}_${b}`;
+
+function render(){
+ const tabs=document.getElementById("tabs"),content=document.getElementById("content");
+ tabs.innerHTML="";content.innerHTML="";
+ routine.forEach((d,di)=>{
+   const tb=document.createElement("button");
+   tb.className="tab"+(di===current?" on":"");tb.textContent=d.day;
+   tb.onclick=()=>{current=di;localStorage.setItem("routine_day",di);render()};
+   tabs.appendChild(tb);
+
+   const sec=document.createElement("section");
+   sec.className="day"+(di===current?" on":"");
+   sec.innerHTML=`<h2>${d.day}: ${d.name}</h2>`;
+
+   d.extras.forEach((x,ei)=>{
+     const id=k(di,"extra",ei),checked=localStorage.getItem(id)==="1";
+     const card=document.createElement("div");card.className="card"+(checked?" done":"");
+     card.innerHTML=`<label class="simple"><input type="checkbox" data-id="${id}" ${checked?"checked":""}><span><b>${x[0]}</b><div class="hint">${x[1]}</div></span></label>`;
+     sec.appendChild(card);
+   });
+
+   d.items.forEach((x,ei)=>{
+     const card=document.createElement("div");
+     let rows="",all=true;
+     for(let s=0;s<x[1];s++){
+       const id=k(di,"set",ei,s),checked=localStorage.getItem(id)==="1"; if(!checked) all=false;
+       const w=localStorage.getItem(k(di,"weight",ei,s))||"";
+       const r=localStorage.getItem(k(di,"reps",ei,s))||"";
+       rows+=`<div class="row"><span>Serie ${s+1}</span><input type="checkbox" data-id="${id}" ${checked?"checked":""}><input type="number" inputmode="decimal" placeholder="kg" data-id="${k(di,"weight",ei,s)}" value="${w}"><input type="text" placeholder="${x[2]}" data-id="${k(di,"reps",ei,s)}" value="${r}"></div>`;
+     }
+     card.className="card"+(all?" done":"");
+     card.innerHTML=`<div class="ex">${x[0]}</div><div class="hint">${x[3]}</div>${rows}`;
+     sec.appendChild(card);
+   });
+
+   const note=localStorage.getItem(k(di,"note","main"))||"";
+   const notes=document.createElement("div");notes.className="card";
+   notes.innerHTML=`<div class="ex">Registro del día</div><div class="hint">Molestias, energía, técnica o cambios.</div><textarea data-id="${k(di,"note","main")}" placeholder="Ej.: esfuerzo 7/10, rodillas estables...">${note}</textarea>`;
+   sec.appendChild(notes);
+   content.appendChild(sec);
+ });
+ bind();progress();
+}
+
+function bind(){
+ document.querySelectorAll("[data-id]").forEach(el=>{
+   const save=()=>{
+     if(el.type==="checkbox") localStorage.setItem(el.dataset.id,el.checked?"1":"0");
+     else localStorage.setItem(el.dataset.id,el.value);
+   };
+   el.addEventListener("change",()=>{save();render()});
+   if(el.tagName==="TEXTAREA"||el.type==="text"||el.type==="number") el.addEventListener("input",save);
+ });
+}
+function keysForDay(di){
+ const a=[];
+ routine[di].extras.forEach((_,i)=>a.push(k(di,"extra",i)));
+ routine[di].items.forEach((x,i)=>{for(let s=0;s<x[1];s++)a.push(k(di,"set",i,s))});
+ return a;
+}
+function progress(){
+ const ks=keysForDay(current),done=ks.filter(x=>localStorage.getItem(x)==="1").length;
+ const p=ks.length?Math.round(done/ks.length*100):0;
+ document.getElementById("pct").textContent=p+"%";document.getElementById("fill").style.width=p+"%";
+}
+document.getElementById("resetDay").onclick=()=>{
+ if(confirm("¿Reiniciar las casillas del día?")){keysForDay(current).forEach(x=>localStorage.removeItem(x));render()}
+};
+document.getElementById("resetWeek").onclick=()=>{
+ if(confirm("¿Reiniciar las casillas de toda la semana?")){routine.forEach((_,i)=>keysForDay(i).forEach(x=>localStorage.removeItem(x)));render()}
+};
+render();
+</script>
+</body>
+</html>
